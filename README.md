@@ -1,2 +1,2 @@
 # distribution-transaction
-开发分布式事务的仓库
+开发分布式锁的仓库
