@@ -1,6 +1,7 @@
 package cn.com.client.hetao.config;
 
 import cn.com.client.hetao.startserver.NettyServerStart;
+import cn.com.client.hetao.startserver.SimpleRepeatLinkedServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,10 @@ public class SimpleTransactionFactory implements TransactionFactory {
         NettyClientProperty.urls = property.getUrls();
         NettyClientProperty.priority = property.getPriority();
         log.info("数据初始化");
-        NettyServerStart.init();
+//        NettyServerStart.init();
+//        NettyServerStart.connect()
+        SimpleRepeatLinkedServer linkedServer = new SimpleRepeatLinkedServer();
+        linkedServer.repeatLinkedServer();
         log.info("Netty客户端初始化完毕");
     }
 }

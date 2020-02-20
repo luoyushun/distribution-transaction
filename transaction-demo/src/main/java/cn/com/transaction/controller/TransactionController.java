@@ -22,7 +22,7 @@ public class TransactionController {
 //            e.printStackTrace();
 //        }
         System.out.println(Thread.currentThread().getName() + "======" + c);
-        simpleNettyServerDeal.unLock("hello");
+        simpleNettyServerDeal.unLock(resourceId);
         return "helloWorld";
     }
 

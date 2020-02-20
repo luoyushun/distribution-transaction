@@ -16,7 +16,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/19 19:35
- *@desc
+ *@desc 这个是启动netty服务的服务器的类
  **/
 public class NettyServerStart {
 
@@ -30,9 +30,14 @@ public class NettyServerStart {
 
     private static volatile ChannelFuture channelFuture;
 
+    private static volatile EventLoopGroup workerGroup;
+
+    /**
+     * 这里是初始化netty服务器
+     */
     public static void init() {
         urls = NettyClientProperty.urls.split(";");
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap(); // (1)
         bootstrap.group(workerGroup); // (2)
         bootstrap.channel(NioSocketChannel.class); // (3)
@@ -48,13 +53,23 @@ public class NettyServerStart {
                 ch.pipeline().addLast(new DataDealHandler());
             }
         });
-        connect(0);
+//        connect(0);
     }
 
+    /**
+     * 这里是关闭与服务器的连接
+     */
+    public static void close() {
+        workerGroup.shutdownGracefully();
+    }
+
+    /**
+     * 这里是连接服务器的
+     * @param index
+     * @return
+     */
     public static boolean connect(Integer index) {
         if (index >= urls.length) {
-            isStart = false;
-            isOver = true;
             return false;
         }
         try {
@@ -68,26 +83,28 @@ public class NettyServerStart {
                     }catch (Exception e) {
                         e.printStackTrace();
                         isStart = false;
+                    }finally {
+                        workerGroup.shutdownGracefully();
                     }
                 }
             });
         } catch (Exception e) {
-            index ++;
-            return connect(index);
+            return false;
         }
         return true;
     }
 
+    /**
+     * 这里是发送消息给服务器的
+     * @param ts
+     * @param <T>
+     * @return
+     */
     public static  <T> boolean sendMessage(T ts) {
 //        final String message = JSONObject.toJSONString(ts);
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                try {
-//                    Thread.sleep(200);
-//                }catch (Exception e) {
-//                    e.printStackTrace();
-//                }
                 channelFuture.channel().writeAndFlush(ts);
             }
         }).start();

@@ -4,8 +4,12 @@ import cn.com.client.hetao.config.DefinationDataBean;
 import cn.com.client.hetao.config.IdWorkerBean;
 import cn.com.client.hetao.config.NettyClientProperty;
 import cn.com.client.hetao.entity.TransactionExtDefination;
+import cn.com.client.hetao.handler.SimpleDealWaitDataHandler;
+import cn.com.client.hetao.handler.SimpleTransactionDealDataHandler;
 import cn.com.common.hetao.entity.TransactionDefinationEntity;
 import cn.com.common.hetao.enums.LockStatus;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +21,8 @@ import java.util.concurrent.CountDownLatch;
  *@desc
  **/
 public class SimpleNettyServerDeal implements NettyServerDeal {
+
+    Log log = LogFactory.getLog(SimpleNettyServerDeal.class);
 
     @Override
     public boolean lock(String key, String desc) {
@@ -70,7 +76,7 @@ public class SimpleNettyServerDeal implements NettyServerDeal {
                     if (!c) {
                         entities.add(extDefination);
                         DefinationDataBean.getInstances().put(entity.getResourcesId(), entities);
-                        System.out.println("size ====" + entities.size() + "    " + extDefination.getDefinationEntity().getId());
+                        log.info("size ====" + entities.size() + "    " + extDefination.getDefinationEntity().getId());
                         NettyServerStart.sendMessage(entity);
                     }
                 }
@@ -81,16 +87,22 @@ public class SimpleNettyServerDeal implements NettyServerDeal {
                 NettyServerStart.sendMessage(entity);
             }
         }
-        synchronized (extDefination) {
+//        synchronized (extDefination) {
             try {
                 if (!c) {
 //                    entity.wait();
+                    extDefination.setRepeatRequest(false);
                     extDefination.getCountDownLatch().await();
+                    if (extDefination.isRepeatRequest()) {
+                        SimpleDealWaitDataHandler dealWaitDataHandler = new SimpleDealWaitDataHandler();
+                        boolean status = dealWaitDataHandler.waitDataHandler(extDefination);
+                        return status;
+                    }
                 }
             }catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+//        }
         if (entity.getLockStatus().intValue() == LockStatus.SUCCESS.value().intValue()) {
             return true;
         }
@@ -112,6 +124,8 @@ public class SimpleNettyServerDeal implements NettyServerDeal {
     @Override
     public boolean unLock(String key) {
         Thread thread = Thread.currentThread();
+        log.info("进入解锁环境");
+//        System.out.println("进入解锁环境");
         synchronized (DefinationDataBean.getInstances()) {
             List<TransactionExtDefination> entities = DefinationDataBean.getInstances().get(key);
             if (entities == null || entities.isEmpty()) return true;
@@ -128,7 +142,8 @@ public class SimpleNettyServerDeal implements NettyServerDeal {
                         entity.setCurrentThread(null);
                         NettyServerStart.sendMessage(entity);
                         entities.remove(index);
-                        System.out.println("释放锁   " + entity.getId());
+//                        System.out.println("释放锁   " + entity.getId());
+                        log.info("释放锁   " + entity.getId());
                         DefinationDataBean.getInstances().put(entity.getResourcesId(), entities);
                         break;
                     }

@@ -21,5 +21,6 @@ public class TransactionExtDefination implements Serializable {
     private TransactionDefinationEntity definationEntity;
     private Thread thread;
     private CountDownLatch countDownLatch;
+    private boolean isRepeatRequest;
 
 }

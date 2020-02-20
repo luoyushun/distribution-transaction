@@ -65,6 +65,7 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
         List<ContainorDataDeal> dataDeals = TransactionContainorBean.dataWaitDeals.get(containorDataDeal.getDefinationEntity().getResourcesId());
         if (dataDeals == null) return true;
         synchronized (dataDeals) {
+            if (dataDeals.isEmpty()) return true;
             ContainorDataDeal con = TransactionContainorBean.dataGainDeals.get(containorDataDeal.getDefinationEntity().getResourcesId());
             Collections.sort(dataDeals,new ContainorDataDealCompara());
             ContainorDataDeal dataDeal = dataDeals.get(0);

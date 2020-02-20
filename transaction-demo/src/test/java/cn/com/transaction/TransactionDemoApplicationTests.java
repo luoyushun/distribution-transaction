@@ -25,7 +25,7 @@ class TransactionDemoApplicationTests {
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		CountDownLatch downLatch = new CountDownLatch(10000);
 		for (int i = 0; i< 10000; i++) {
-			final String key = "hello";
+			final String key = "hello" + (i%100);
 			executorService.submit(new Runnable() {
 				@lombok.SneakyThrows
 				@Override

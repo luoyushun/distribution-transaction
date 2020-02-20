@@ -45,6 +45,9 @@ public class NettyService {
     @Autowired
     private ExecutorService executorService;
 
+    @Resource(name = "simpleClearLock")
+    private ClearLockData clearLockData;
+
     @PostConstruct
     public void init() {
         log.info("开始初始化netty服务");
@@ -58,7 +61,7 @@ public class NettyService {
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new ObjectEncoder());
                         ch.pipeline().addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
-                        ch.pipeline().addLast(new DataDealHandler(receiptDistributionAbs));
+                        ch.pipeline().addLast(new DataDealHandler(receiptDistributionAbs, clearLockData));
                     }
                 });
         serverBootstrap.option(ChannelOption.SO_BACKLOG, 2048);

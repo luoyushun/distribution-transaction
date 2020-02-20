@@ -6,6 +6,8 @@ import cn.com.client.hetao.entity.TransactionExtDefination;
 import cn.com.common.hetao.entity.TransactionDefinationEntity;
 import cn.com.common.hetao.entity.TransactionResultEntity;
 import cn.com.common.hetao.enums.LockStatus;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 
@@ -15,6 +17,9 @@ import java.util.List;
  *@desc
  **/
 public class SimpleTransactionDealDataHandler implements TransactionDealDataHandler {
+
+    Log log = LogFactory.getLog(SimpleTransactionDealDataHandler.class);
+
     @Override
     public <T> boolean dealHandler(T t) {
         final TransactionResultEntity definationEntity = (TransactionResultEntity) t;
@@ -25,13 +30,16 @@ public class SimpleTransactionDealDataHandler implements TransactionDealDataHand
                 TransactionResultEntity entity = definationEntity;
                 if (entity == null) return;
                 if (entity.getLockStatus().intValue() == LockStatus.LOCKING.value()){
-                    System.out.println("等待锁");
+//                    System.out.println("等待锁");
+                    log.info("等待锁");
                 } else {
-                    System.out.println("要开始释放锁" + entity.getId());
+//                    System.out.println("要开始释放锁" + entity.getId());
+                    log.info("要开始释放锁" + entity.getId());
                     synchronized (DefinationDataBean.getInstances()) {
                         List<TransactionExtDefination> definationEntities = DefinationDataBean.getInstances().get(entity.getResourcesId());
                         if (definationEntities == null || definationEntities.isEmpty()){
-                            System.out.println("数据为空");
+//                            System.out.println("数据为空");
+                            log.info("数据为空");
                             return;
                         }
                         for (TransactionExtDefination exd : definationEntities) {
