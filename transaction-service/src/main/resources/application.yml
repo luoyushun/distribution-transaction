@@ -1,0 +1,7 @@
+server:
+  port: 8099
+redis:
+  urls: 127.0.0.1:6379
+
+connection:
+    port: 9999
