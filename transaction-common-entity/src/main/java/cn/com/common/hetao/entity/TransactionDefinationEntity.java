@@ -46,10 +46,6 @@ public class TransactionDefinationEntity implements Serializable {
      * 锁的状态
      */
     private Integer lockStatus;
-    /**
-     * 属于哪个线程
-     */
-    private Thread currentThread;
 
     /**
      * 请求的时间
@@ -85,5 +81,20 @@ public class TransactionDefinationEntity implements Serializable {
      * 加锁次数
      */
     private Integer times;
+
+    /**
+     * 这个是同步的状态
+     */
+    private Integer inStepStatus;
+
+    /**
+     * ip地址
+     */
+    private String ip;
+
+    /**
+     * 端口号
+     */
+    private Integer port;
 
 }

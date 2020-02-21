@@ -13,6 +13,7 @@ public enum LockStatus {
     TIMEOUT(6),
     RELEASE(7),
     REQUEST(8),
+    INSTEP(9),
     UNKWON(3);
     private Integer value;
     private LockStatus(Integer value) {

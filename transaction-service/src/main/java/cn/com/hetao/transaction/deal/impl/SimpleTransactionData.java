@@ -1,12 +1,19 @@
 package cn.com.hetao.transaction.deal.impl;
 
+import cn.com.common.hetao.entity.TransactionDefinationEntity;
+import cn.com.common.hetao.utils.GainThisComputerInfo;
+import cn.com.hetao.config.RedisOperation;
 import cn.com.hetao.config.TransactionContainorBean;
 import cn.com.common.hetao.enums.LockStatus;
 import cn.com.common.hetao.enums.ReleaseStatus;
+import cn.com.hetao.instep.SimpleInStepOtherServer;
 import cn.com.hetao.netty.ContainorDataDeal;
 import cn.com.hetao.transaction.deal.TransactionDataDealAbs;
 import cn.com.hetao.transaction.compare.ContainorDataDealCompara;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,6 +31,18 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 @Slf4j
 public class SimpleTransactionData extends TransactionDataDealAbs {
+
+    /**
+     * 这个是绑定的端口
+     */
+    @Value("${connection.port}")
+    private Integer port;
+
+    @Autowired
+    private RedisOperation redisOperation;
+
+    @Autowired
+    private SimpleInStepOtherServer otherServer;
 
     @Override
     public boolean requestResource(ContainorDataDeal dataDeal) {
@@ -65,8 +84,13 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
         List<ContainorDataDeal> dataDeals = TransactionContainorBean.dataWaitDeals.get(containorDataDeal.getDefinationEntity().getResourcesId());
         if (dataDeals == null) return true;
         synchronized (dataDeals) {
-            if (dataDeals.isEmpty()) return true;
             ContainorDataDeal con = TransactionContainorBean.dataGainDeals.get(containorDataDeal.getDefinationEntity().getResourcesId());
+            if (dataDeals.isEmpty()) {
+                if (con == null) {
+                    otherServer.inStepOneToOtherServer(containorDataDeal.getDefinationEntity());
+                }
+                return true;
+            }
             Collections.sort(dataDeals,new ContainorDataDealCompara());
             ContainorDataDeal dataDeal = dataDeals.get(0);
             if (con != null && dataDeal.getDefinationEntity().getId().longValue() == con.getDefinationEntity().getId().longValue()) {
@@ -75,10 +99,16 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
             } else if (con != null) {
                 return true;
             }
-//            else if (con == null && containorDataDeal.getDefinationEntity().getId() != dataDeal.getDefinationEntity().getId()) {
-//                log.info("获取锁失败");
-//                return true;
-//            }
+            if (con == null) {
+                // 这里是检查数据是否进行了
+                TransactionDefinationEntity definationEntity = dataDeal.getDefinationEntity();
+                definationEntity.setIp(GainThisComputerInfo.getIp());
+                definationEntity.setPort(port.intValue());
+                boolean status = redisOperation.saveRedis(definationEntity);
+                if (!status) {
+                    return false;
+                }
+            }
             dataDeals.remove(0);
             dataDeal.getDefinationEntity().setGainLockTime(new Date());
             log.info("成功获取锁");
@@ -92,6 +122,7 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
     public boolean releaseResource(ContainorDataDeal containorDataDeal, Integer status) throws Exception {
         if (status.intValue() == ReleaseStatus.NORMAL.value().intValue()) {
             TransactionContainorBean.dataGainDeals.remove(containorDataDeal.getDefinationEntity().getResourcesId());
+            redisOperation.delete(containorDataDeal.getDefinationEntity().getResourcesId());
             this.findGainResource(containorDataDeal);
             containorDataDeal.sendMessages(ReleaseStatus.NORMAL.value().intValue(), "成功释放锁了");
         } else if (status.intValue() == ReleaseStatus.CANCEL.value().intValue()) {
@@ -112,6 +143,7 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
             ContainorDataDeal con = TransactionContainorBean.dataGainDeals.get(containorDataDeal.getDefinationEntity().getResourcesId());
             if (con == null) return true;
             TransactionContainorBean.dataGainDeals.remove(containorDataDeal.getDefinationEntity().getResourcesId());
+            redisOperation.delete(containorDataDeal.getDefinationEntity().getResourcesId());
             con.sendMessages(ReleaseStatus.CANCEL.value().intValue(), "取消锁成功");
             this.findGainResource(con);
         } else if (status.intValue() == ReleaseStatus.TIMEOUT.value().intValue()) {

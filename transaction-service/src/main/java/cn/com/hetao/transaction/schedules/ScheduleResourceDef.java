@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/19 16:43
- *@desc
+ *@desc 这里是处理信息的地方
  **/
 @Component
 public class ScheduleResourceDef {

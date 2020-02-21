@@ -1,12 +1,12 @@
 package cn.com.hetao.netty;
 
 import cn.com.hetao.config.ContainorConfig;
+import cn.com.hetao.config.RedisOperation;
 import cn.com.hetao.config.TransactionContainorBean;
 import cn.com.hetao.transaction.deal.TransactionDataDealAbs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.rmi.runtime.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/20 17:51
- *@desc
+ *@desc 清楚对象信息
  **/
 @Component("simpleClearLock")
 @Slf4j
@@ -28,6 +28,14 @@ public class SimpleClearLockData implements ClearLockData {
     @Autowired
     private TransactionDataDealAbs transactionDataDealAbs;
 
+    @Autowired
+    private RedisOperation redisOperation;
+
+    /**
+     * 清空数据数据
+     * @param ip
+     * @param port
+     */
     @Override
     public void clearLockAndGainLock(String ip, Integer port) {
         log.info("ip=" + ip + " port = "+ port +" 主机断线了 ");
@@ -65,6 +73,8 @@ public class SimpleClearLockData implements ClearLockData {
             }
             for (ContainorDataDeal deal: removes) {
                 TransactionContainorBean.dataGainDeals.remove(deal.getDefinationEntity().getResourcesId());
+                // 删除全局缓存中的数据
+                redisOperation.delete(deal.getDefinationEntity().getResourcesId());
                 log.info("已经删除了数据 " + deal.getDefinationEntity().getResourcesId() + deal.getDefinationEntity().getId());
                 try {
                     transactionDataDealAbs.findGainResource(deal);

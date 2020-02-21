@@ -9,7 +9,7 @@ import java.net.InetSocketAddress;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/20 14:57
- *@desc
+ *@desc 获取客户端信息
  **/
 public class SimpleIpPortRemoteInfos implements RemoteInfos {
 
@@ -24,17 +24,32 @@ public class SimpleIpPortRemoteInfos implements RemoteInfos {
         return socketAddress;
     }
 
+    /**
+     * 获取客户端的Ip地址
+     * @param t
+     * @param <T>
+     * @return
+     */
     @Override
     public <T> String getIp(T t) {
         InetSocketAddress socketAddress = getInetAddress(t);
+        if (socketAddress == null) return null;
         InetAddress address = socketAddress.getAddress();
+        if (address == null) return null;
         String ip = address.getHostAddress();
         return ip;
     }
 
+    /**
+     * 获取客户端的端口号
+     * @param t
+     * @param <T>
+     * @return
+     */
     @Override
     public <T> Integer getPort(T t) {
         InetSocketAddress socketAddress = getInetAddress(t);
+        if (socketAddress == null) return 0;
         Integer port = socketAddress.getPort();
         return port;
     }

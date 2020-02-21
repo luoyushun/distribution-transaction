@@ -3,7 +3,7 @@ package cn.com.hetao.netty;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/20 14:55
- *@desc
+ *@desc 获取客户端的信息接口
  **/
 public interface RemoteInfos {
 

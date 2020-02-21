@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/19 12:34
- *@desc
+ *@desc 这个是netty服务的类
  **/
 @Component
 @Slf4j
@@ -36,18 +36,33 @@ public class NettyService {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
+    /**
+     * 这个是绑定的端口
+     */
     @Value("${connection.port}")
     private Integer port;
 
+    /**
+     * 这个是接收发送数据的对应的类
+     */
     @Resource(name = "simpleObject")
     private ReceiptDistributionAbs receiptDistributionAbs;
 
+    /**
+     * 这个是初始化线程池
+     */
     @Autowired
     private ExecutorService executorService;
 
+    /**
+     * 这个是注入清理锁的对象的数据
+     */
     @Resource(name = "simpleClearLock")
     private ClearLockData clearLockData;
 
+    /**
+     * 初始化netty服务器
+     */
     @PostConstruct
     public void init() {
         log.info("开始初始化netty服务");
@@ -84,6 +99,9 @@ public class NettyService {
         log.info("netty服务启动");
     }
 
+    /**
+     * 关闭服务器
+     */
     public void close() {
         if (bossGroup != null && !bossGroup.isShutdown()) {
             bossGroup.shutdownGracefully();

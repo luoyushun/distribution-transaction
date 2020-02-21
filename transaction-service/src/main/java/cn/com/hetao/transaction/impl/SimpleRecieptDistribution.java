@@ -40,7 +40,7 @@ public class SimpleRecieptDistribution extends ReceiptDistributionAbs {
         if (StringUtils.isEmpty(datas)) return;
         TransactionDefinationEntity definationEntity = JSONObject.toJavaObject(JSONObject.parseObject(datas), TransactionDefinationEntity.class);
         definationEntity.setRequestTime(new Date());
-        definationEntity.setCurrentThread(Thread.currentThread());
+//        definationEntity.setCurrentThread(Thread.currentThread());
         if (definationEntity == null) return;
         if (definationEntity.getId() == null || definationEntity.getId().longValue() <= 0) {
             definationEntity.setId(idWorker.nextId());

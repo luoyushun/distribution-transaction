@@ -1,9 +1,11 @@
 package cn.com.hetao.transaction.impl;
 
 import cn.com.common.hetao.entity.TransactionDefinationEntity;
+import cn.com.common.hetao.enums.InStepStatus;
 import cn.com.common.hetao.enums.LockStatus;
 import cn.com.common.hetao.enums.ReleaseStatus;
 import cn.com.common.hetao.utils.IdWorker;
+import cn.com.hetao.config.TransactionContainorBean;
 import cn.com.hetao.netty.ContainorDataDeal;
 import cn.com.hetao.netty.SimpleIpPortRemoteInfos;
 import cn.com.hetao.transaction.ReceiptDistributionAbs;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 /*
  *@username LUOYUSHUN
@@ -39,7 +43,6 @@ public class SimpleObjectRecieptDistribution extends ReceiptDistributionAbs {
         }
         if (definationEntity == null) return;
         definationEntity.setRequestTime(new Date());
-        definationEntity.setCurrentThread(Thread.currentThread());
         definationEntity.setMicServerIp(remoteInfos.getIp(ctx));
         definationEntity.setMicServerPort(remoteInfos.getPort(ctx));
         final ContainorDataDeal containorDataDeal = new ContainorDataDeal();
@@ -58,6 +61,16 @@ public class SimpleObjectRecieptDistribution extends ReceiptDistributionAbs {
                     containorDataDeal.sendMessages(LockStatus.FAILURE.value(), "请求加锁失败");
                 }catch (Exception e1) {
                     e1.printStackTrace();
+                }
+            }
+        } else if (definationEntity.getLockStatus().intValue() == LockStatus.INSTEP.value().intValue()) {
+            // 这里是进行同步信息的
+            //这里是申请获取权限的
+            if (definationEntity.getInStepStatus().intValue() == InStepStatus.RELEASE.value().intValue()) {
+                try {
+                    simpleTransactionData.findGainResource(containorDataDeal);
+                }catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

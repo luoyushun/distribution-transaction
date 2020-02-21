@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +47,21 @@ class TransactionDemoApplicationTests {
 	public void getCpu() {
 		int a = Runtime.getRuntime().availableProcessors();
 		System.out.println(a);
+	}
+
+	@Test
+	public void getREs() throws UnknownHostException {
+		InetAddress addr = InetAddress.getLocalHost();
+		System.out.println("Local HostAddress: "+addr.getHostAddress());
+				String hostname = addr.getHostName();
+		System.out.println("Local host name: "+hostname);
+	}
+
+	public static void main(String[] args) throws UnknownHostException {
+		InetAddress addr = InetAddress.getLocalHost();
+		System.out.println("Local HostAddress: "+addr.getHostAddress());
+		String hostname = addr.getHostName();
+		System.out.println("Local host name: "+hostname);
 	}
 
 }

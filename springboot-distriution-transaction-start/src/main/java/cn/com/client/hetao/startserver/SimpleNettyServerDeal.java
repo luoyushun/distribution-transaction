@@ -139,7 +139,7 @@ public class SimpleNettyServerDeal implements NettyServerDeal {
                         break;
                     }else{
                         entity.setLockStatus(LockStatus.CANCEL.value());
-                        entity.setCurrentThread(null);
+//                        entity.setCurrentThread(null);
                         NettyServerStart.sendMessage(entity);
                         entities.remove(index);
 //                        System.out.println("释放锁   " + entity.getId());
