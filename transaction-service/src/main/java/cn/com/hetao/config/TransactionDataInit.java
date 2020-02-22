@@ -39,7 +39,7 @@ public class TransactionDataInit implements InitializingBean {
     }
 
     private void initThread() {
-        int cupNum = Runtime.getRuntime().availableProcessors();
+        int cupNum = Runtime.getRuntime().availableProcessors() * 2;
         log.info("初始化程序");
         /**
          * 这里是初始化线程数量
