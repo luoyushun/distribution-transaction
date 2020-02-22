@@ -13,15 +13,12 @@ import cn.com.hetao.transaction.compare.ContainorDataDealCompara;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /*
  *@username LUOYUSHUN
@@ -47,14 +44,14 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
     @Override
     public boolean requestResource(ContainorDataDeal dataDeal) {
         try {
-            synchronized (TransactionContainorBean.dataGainDeals) {
-                ContainorDataDeal containorDataDeal = TransactionContainorBean.dataGainDeals.get(dataDeal.getDefinationEntity().getResourcesId());
-                if (containorDataDeal != null && containorDataDeal.getDefinationEntity().getId().longValue()
-                        == dataDeal.getDefinationEntity().getId().longValue()) {
-                    dataDeal.getDefinationEntity().setGainLockTime(new Date());
-                    dataDeal.sendMessages(LockStatus.SUCCESS.value(), "成功上锁");
-                    return true;
-                }
+            ContainorDataDeal containorDataDeal = TransactionContainorBean.dataGainDeals.get(dataDeal.getDefinationEntity().getResourcesId());
+            if (containorDataDeal != null && containorDataDeal.getDefinationEntity().getId().longValue()
+                    == dataDeal.getDefinationEntity().getId().longValue()) {
+                dataDeal.getDefinationEntity().setGainLockTime(new Date());
+                dataDeal.sendMessages(LockStatus.SUCCESS.value(), "成功上锁");
+                return true;
+            }
+//            synchronized (TransactionContainorBean.dataWaitDeals) {
                 List<ContainorDataDeal> dataDeals = TransactionContainorBean.dataWaitDeals.get(dataDeal.getDefinationEntity().getResourcesId());
                 if (dataDeals == null) dataDeals = new ArrayList<>();
                 synchronized (dataDeals) {
@@ -62,17 +59,14 @@ public class SimpleTransactionData extends TransactionDataDealAbs {
                     TransactionContainorBean.dataWaitDeals.put(dataDeal.getDefinationEntity().getResourcesId(), dataDeals);
                 }
                 if (dataDeals.size() == 1 && containorDataDeal == null) {
-//                dataDeal.getDefinationEntity().setLockStatus(LockStatus.SUCCESS.value());
                     dataDeal.getDefinationEntity().setGainLockTime(new Date());
-//                dataDeal.sendMessages(LockStatus.SUCCESS.value(), "成功上锁");
-//                TransactionContainorBean.dataGainDeals.put(dataDeal.getDefinationEntity().getResourcesId(), dataDeal);
                     findGainResource(dataDeal);
                 } else {
                     dataDeal.getDefinationEntity().setLockStatus(LockStatus.LOCKING.value());
                     dataDeal.sendMessages(LockStatus.LOCKING.value(), "等待请求资源");
                     this.findGainResource(dataDeal);
                 }
-            }
+//            }
         }catch (Exception e){
             e.printStackTrace();
         }
