@@ -24,6 +24,8 @@ public class DataDealHandler extends ChannelInboundHandlerAdapter {
         super.handlerRemoved(ctx);
 //        System.out.println("与服务器断开链接");
         log.info("与服务器断开链接");
+        if (SimpleRepeatLinkedServer.isLoading) return;
+        SimpleRepeatLinkedServer.isLoading = true;
         final SimpleRepeatLinkedServer linkedServer = new SimpleRepeatLinkedServer();
         ExecutorServiceBean.getInstances().submit(new Runnable() {
             @Override

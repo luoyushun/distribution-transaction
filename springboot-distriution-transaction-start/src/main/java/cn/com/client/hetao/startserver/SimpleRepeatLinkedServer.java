@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentMap;
  **/
 public class SimpleRepeatLinkedServer implements RepeatLinkedServer {
 
+    public static volatile boolean isLoading = false;
+
     Log log = LogFactory.getLog(SimpleRepeatLinkedServer.class);
 
     @Override
@@ -33,7 +35,10 @@ public class SimpleRepeatLinkedServer implements RepeatLinkedServer {
                 NettyServerStart.close();
                 i++;
             }
-            if (isStart) break;
+            if (isStart) {
+                SimpleRepeatLinkedServer.isLoading = false;
+                break;
+            }
             dealLockServer(ClientLockDeal.CLEARLOCK.value().intValue());
             log.info("释放所有要求锁的资源");
             try{
