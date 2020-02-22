@@ -1,5 +1,7 @@
 package cn.com.hetao.netty;
 
+import cn.com.common.hetao.entity.TransactionDefinationEntity;
+import cn.com.hetao.config.TaskExecutorsEntity;
 import cn.com.hetao.config.TransactionContainorBean;
 import cn.com.hetao.instep.SimpleConnectionNettyClient;
 import cn.com.hetao.transaction.ReceiptDistributionAbs;
@@ -71,7 +73,13 @@ public class DataDealHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        receiptDistributionAbs.receiptDataAndDeal(ctx, msg);
+        if (msg instanceof TransactionDefinationEntity) {
+            TransactionDefinationEntity entity = (TransactionDefinationEntity) msg;
+            int mode = (int) (entity.getId() % TransactionContainorBean.taskExecutorsEntities.size());
+            TaskExecutorsEntity executorsEntity = TransactionContainorBean.taskExecutorsEntities.get(mode);
+            executorsEntity.addDefinationEntity(ctx, entity);
+        }
+//        receiptDistributionAbs.receiptDataAndDeal(ctx, msg);
     }
 
     /**

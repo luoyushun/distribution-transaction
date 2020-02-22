@@ -34,9 +34,31 @@ public class TransactionDataInit implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        initCluster();
+        initThread();
+    }
+
+    private void initThread() {
         int cupNum = Runtime.getRuntime().availableProcessors();
         log.info("初始化程序");
+        /**
+         * 这里是初始化线程数量
+         */
+        if (cupNum > 0) {
+            log.info("初始化线程");
+            for (int i=0; i< cupNum; i++) {
+                TaskExecutorsEntity taskExecutorsEntity = new TaskExecutorsEntity();
+                taskExecutorsEntity.setReceiptDistributionAbs(receiptDistributionAbs);
+                TransactionContainorBean.taskExecutorsEntities.add(taskExecutorsEntity);
+                TransactionContainorBean.executorService.submit(taskExecutorsEntity);
+            }
+            log.info("初始化线程完成");
+        }
+    }
+
+    private void initCluster() {
         if (!isClusters) return;
+        log.info("初始化集群");
         String[] addrs = addresses.split(";");
         for (String add : addrs) {
             TransactionContainorBean.servers.add(add);
@@ -45,5 +67,6 @@ public class TransactionDataInit implements InitializingBean {
             SimpleConnectionNettyClient simpleConnectionNettyClient = new SimpleConnectionNettyClient(receiptDistributionAbs);
             simpleConnectionNettyClient.connection(address);
         }
+        log.info("初始化集群完成");
     }
 }

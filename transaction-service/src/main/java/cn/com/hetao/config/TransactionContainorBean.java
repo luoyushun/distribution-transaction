@@ -50,4 +50,9 @@ public class TransactionContainorBean {
      */
     public static volatile ExecutorService executorService = Executors.newCachedThreadPool();
 
+    /**
+     * 这个是该程序中，一个客户端可以开启多少个线程来处理的
+     */
+    public static volatile List<TaskExecutorsEntity> taskExecutorsEntities = new ArrayList<>();
+
 }
