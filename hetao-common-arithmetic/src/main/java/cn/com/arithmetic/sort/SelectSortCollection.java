@@ -10,6 +10,14 @@ import java.util.List;
  **/
 public interface SelectSortCollection extends SortCollection {
 
+    /**
+     * 选择极值
+     * @param seat
+     * @param datas
+     * @param comparator
+     * @param <T>
+     * @return
+     */
     public <T> int extremumValueSeat(int seat, List<T> datas, Comparator<T> comparator);
 
 }
