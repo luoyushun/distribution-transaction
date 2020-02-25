@@ -7,7 +7,7 @@ import java.util.Comparator;
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/25 12:38
- *@desc
+ *@desc B-树的算法
  **/
 public class BinarySubSimple implements BinarySub {
 
