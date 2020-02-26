@@ -32,20 +32,6 @@ public abstract class DataFileOperatorAbs implements DataFileOperator {
         return null;
     }
 
-    protected byte[] decodeValue(ByteBuffer bytes) {
-        int len = bytes.limit() - bytes.position();
-        byte[] bytes1 = new byte[len];
-        bytes.get(bytes1);
-        return bytes1;
-    }
-
-    protected ByteBuffer encodeValue(byte[] value) {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(value.length);
-        byteBuffer.clear();
-        byteBuffer.get(value, 0, value.length);
-        return byteBuffer;
-    }
-
     protected int getLength(RandomAccessFile randomFile, boolean check) throws IOException {
         List<Byte> byteList = new ArrayList<Byte>();
         while (true) {
@@ -144,7 +130,6 @@ public abstract class DataFileOperatorAbs implements DataFileOperator {
         // 打开一个随机访问文件流，按读写方式
         RandomAccessFile randomFile = new RandomAccessFile(datasPath, "rws");
         randomFile.seek(randomFile.length());
-//        FileChannel fileChannel = randomFile.getChannel();
         try {
             int length = bytes.length;
             String str = "";
@@ -153,10 +138,6 @@ public abstract class DataFileOperatorAbs implements DataFileOperator {
             } else {
                 str = "\n" + length + "\n";
             }
-//            fileChannel.write(encodeValue(str.getBytes()));
-//            ByteBuffer byteBuffer = encodeValue(bytes);
-//            fileChannel.write(byteBuffer);
-//            fileChannel.close();
             randomFile.write(str.getBytes());
             randomFile.write(bytes);
             randomFile.close();
@@ -164,7 +145,6 @@ public abstract class DataFileOperatorAbs implements DataFileOperator {
         }catch (Exception e) {
             e.printStackTrace();
         } finally {
-//            fileChannel.close();
             randomFile.close();
         }
         return false;
