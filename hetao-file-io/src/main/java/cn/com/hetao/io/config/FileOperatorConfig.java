@@ -22,4 +22,9 @@ public class FileOperatorConfig {
      */
     public static Long fileSize;
 
+    /**
+     * 索引文件的存储路径
+     */
+    public static String index;
+
 }
