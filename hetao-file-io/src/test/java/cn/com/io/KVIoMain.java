@@ -20,12 +20,12 @@ public class KVIoMain {
         for (int i = 0; i < 100; i++) {
             DataEntity dataEntity = new DataEntity();
             dataEntity.setId(0L);
-            dataEntity.setName("" + Math.random() * 100);
+            dataEntity.setName("世纪、你好" + Math.random() * 100);
 
             try {
-                boolean c = valueKeyAdaptor.setValue("world" + i, dataEntity);
+                boolean c = valueKeyAdaptor.setValue("hello" + i, dataEntity);
                 System.out.println(c);
-                dataEntity = valueKeyAdaptor.getValue("world" + i, dataEntity);
+                dataEntity = valueKeyAdaptor.getValue("hello" + i, dataEntity);
                 System.out.println(dataEntity);
             } catch (Exception e) {
                 e.printStackTrace();
