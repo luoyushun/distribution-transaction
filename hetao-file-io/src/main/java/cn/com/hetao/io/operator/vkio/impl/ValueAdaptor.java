@@ -1,6 +1,7 @@
 package cn.com.hetao.io.operator.vkio.impl;
 
 import cn.com.hetao.io.config.FileOperatorConfig;
+import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.io.operator.vkio.KeyFactory;
 import cn.com.hetao.io.operator.vkio.ValueFactory;
 
@@ -66,9 +67,9 @@ public class ValueAdaptor implements ValueFactory {
     }
 
     @Override
-    public <T> Map<String, Long> addValue(T data) throws Exception {
+    public <T> KeyObjectDefination addValue(T data) throws Exception {
         if (data == null) return null;
-        Map<String, Long> datas = new HashMap<String, Long>();
+        KeyObjectDefination datas = new KeyObjectDefination();
         String datasPath = FileOperatorConfig.dataPath + File.separator + defaultData + File.separator + defaultData + ".data";
         File file = new File(FileOperatorConfig.dataPath + File.separator + defaultData);
         if (!file.exists()) file.mkdirs();
@@ -82,8 +83,8 @@ public class ValueAdaptor implements ValueFactory {
             int len = bytes.length;
             long point = randomFile.getFilePointer();
             randomFile.write(bytes);
-            datas.put(KeyFactory.point, point);
-            datas.put(KeyFactory.length, (long) len);
+            datas.setPoint(point);
+            datas.setLength((long) len);
             return datas;
         }catch (Exception e) {
             e.printStackTrace();

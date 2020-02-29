@@ -1,5 +1,7 @@
 package cn.com.hetao.io.operator.vkio;
 
+import cn.com.hetao.io.config.KeyObjectDefination;
+
 import java.util.Map;
 
 /*
@@ -24,6 +26,6 @@ public interface ValueFactory {
      * @param <T>
      * @return
      */
-    public <T> Map<String, Long> addValue(T data) throws Exception;
+    public <T> KeyObjectDefination addValue(T data) throws Exception;
 
 }

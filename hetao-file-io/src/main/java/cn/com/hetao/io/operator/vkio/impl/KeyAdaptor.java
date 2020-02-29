@@ -1,6 +1,7 @@
 package cn.com.hetao.io.operator.vkio.impl;
 
 import cn.com.hetao.io.config.FileOperatorConfig;
+import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.io.operator.vkio.KeyFactory;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class KeyAdaptor implements KeyFactory {
 
     protected String defaultFileName = "default_k_v.idx";
 
-    protected Map<String, Object> getKeyString(String key, RandomAccessFile accessFile) throws Exception {
+    protected KeyObjectDefination getKeyString(String key, RandomAccessFile accessFile) throws Exception {
         List<Byte> bytes = new ArrayList<Byte>();
         while (true) {
             byte b = - 1;
@@ -34,12 +35,12 @@ public class KeyAdaptor implements KeyFactory {
                     String str = new String(bt);
                     String[] strs = str.split(":");
                     if (strs[0].equals(key)) {
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put(KeyFactory.name, strs[0]);
-                        map.put(KeyFactory.time, Long.parseLong(strs[1]));
-                        map.put(KeyFactory.point, Long.parseLong(strs[2]));
-                        map.put(KeyFactory.length, Long.parseLong(strs[3]));
-                        return map;
+                        KeyObjectDefination defination = new KeyObjectDefination();
+                        defination.setName(strs[0]);
+                        defination.setTimeout(Long.parseLong(strs[1]));
+                        defination.setPoint(Long.parseLong(strs[2]));
+                        defination.setLength(Long.parseLong(strs[3]));
+                        return defination;
                     }
                     bytes = new ArrayList<Byte>();
                 } else {
@@ -55,7 +56,7 @@ public class KeyAdaptor implements KeyFactory {
     }
 
     @Override
-    public Map<String, Object> getKeyInfo(String key) throws Exception {
+    public KeyObjectDefination getKeyInfo(String key) throws Exception {
         String dataPath = FileOperatorConfig.index + File.separator + defaultFileName;
         File file = new File(dataPath);
         if (!file.exists()) return null;
@@ -63,7 +64,7 @@ public class KeyAdaptor implements KeyFactory {
         try {
             accessFile = new RandomAccessFile(dataPath, "r");
             accessFile.seek(0);
-            Map<String, Object> datas = getKeyString(key, accessFile);
+            KeyObjectDefination datas = getKeyString(key, accessFile);
             return datas;
         }catch (Exception e) {
             e.printStackTrace();
@@ -76,7 +77,7 @@ public class KeyAdaptor implements KeyFactory {
     }
 
     @Override
-    public List<Map<String, Object>> getKeysInfo() throws Exception {
+    public List<KeyObjectDefination> getKeysInfo() throws Exception {
         String dataPath = FileOperatorConfig.index + File.separator + defaultFileName;
         File file = new File(dataPath + File.separator + defaultFileName);
         if (!file.exists()) return null;
@@ -85,7 +86,7 @@ public class KeyAdaptor implements KeyFactory {
             accessFile = new RandomAccessFile(dataPath, "r");
             accessFile.seek(0);
             List<Byte> bytes = new ArrayList<Byte>();
-            List<Map<String, Object>> keys = new ArrayList<Map<String, Object>>();
+            List<KeyObjectDefination> keys = new ArrayList<KeyObjectDefination>();
             while (true) {
                 byte b = -1;
                 try {
@@ -102,12 +103,12 @@ public class KeyAdaptor implements KeyFactory {
                             bytes = new ArrayList<Byte>();
                             continue;
                         }
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put(KeyFactory.name, strs[0]);
-                        map.put(KeyFactory.time, Long.parseLong(strs[1]));
-                        map.put(KeyFactory.point, Long.parseLong(strs[2]));
-                        map.put(KeyFactory.length, Long.parseLong(strs[3]));
-                        keys.add(map);
+                        KeyObjectDefination defination = new KeyObjectDefination();
+                        defination.setName(strs[0]);
+                        defination.setTimeout(Long.parseLong(strs[1]));
+                        defination.setPoint(Long.parseLong(strs[2]));
+                        defination.setLength(Long.parseLong(strs[3]));
+                        keys.add(defination);
                         bytes = new ArrayList<Byte>();
                     } else {
                         bytes.add(b);
@@ -130,7 +131,7 @@ public class KeyAdaptor implements KeyFactory {
     }
 
     @Override
-    public boolean addKeyInfo(Map<String, Object> keyInfo) throws Exception {
+    public boolean addKeyInfo(KeyObjectDefination keyObjectDefination) throws Exception {
         String dataPath = FileOperatorConfig.index;
         File file = new File(dataPath);
         if (!file.exists()) file.mkdirs();
@@ -140,10 +141,10 @@ public class KeyAdaptor implements KeyFactory {
         try {
             accessFile = new RandomAccessFile(file, "rws");
             accessFile.seek(accessFile.length());
-            String str = (String) keyInfo.get(KeyFactory.name) + ":"
-                    + ((Long) keyInfo.get(KeyFactory.time)).longValue() + ":"
-                    + ((Long) keyInfo.get(KeyFactory.point)).longValue() + ":"
-                    + ((Long) keyInfo.get(KeyFactory.length)).longValue();
+            String str = keyObjectDefination.getName() + ":"
+                    + keyObjectDefination.getTimeout().longValue() + ":"
+                    + keyObjectDefination.getPoint().longValue() + ":"
+                    + keyObjectDefination.getLength().longValue();
             str = str + "\n";
             accessFile.write(str.getBytes());
         }catch (Exception e) {

@@ -1,5 +1,7 @@
 package cn.com.hetao.io.operator.vkio;
 
+import cn.com.hetao.io.config.KeyObjectDefination;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,20 +22,20 @@ public interface KeyFactory {
      * @param key
      * @return
      */
-    public Map<String, Object> getKeyInfo(String key) throws Exception;
+    public KeyObjectDefination getKeyInfo(String key) throws Exception;
 
     /**
      * 获取目前没有过期的键
      * @return
      */
-    public List<Map<String, Object>> getKeysInfo() throws Exception;
+    public List<KeyObjectDefination> getKeysInfo() throws Exception;
 
     /**
      * 添加键的信息
-     * @param keyInfo
+     * @param keyObjectDefination
      * @return
      */
-    public boolean addKeyInfo(Map<String, Object> keyInfo) throws Exception;
+    public boolean addKeyInfo(KeyObjectDefination keyObjectDefination) throws Exception;
 
     /**
      * 删除键

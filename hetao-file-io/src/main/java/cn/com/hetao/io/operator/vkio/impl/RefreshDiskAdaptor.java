@@ -1,5 +1,6 @@
 package cn.com.hetao.io.operator.vkio.impl;
 
+import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.io.operator.vkio.KVRefreshDiskFactory;
 import cn.com.hetao.io.operator.vkio.RefreshDiskFactory;
 
@@ -16,13 +17,13 @@ public class RefreshDiskAdaptor implements RefreshDiskFactory {
     protected KVRefreshDiskFactory kvRefreshDisk = new KVRefreshDiskAdaptor();
 
     @Override
-    public boolean refreshSaveDiskValueDatas(List<Map<String, Object>> keys) throws Exception {
-        List<Map<String, Object>> datas = kvRefreshDisk.refreshValue(keys);
+    public boolean refreshSaveDiskValueDatas(List<KeyObjectDefination> keys) throws Exception {
+        List<KeyObjectDefination> datas = kvRefreshDisk.refreshValue(keys);
         return refreshSaveDiskKeyDatas(datas);
     }
 
     @Override
-    public boolean refreshSaveDiskKeyDatas(List<Map<String, Object>> keys) throws Exception {
+    public boolean refreshSaveDiskKeyDatas(List<KeyObjectDefination> keys) throws Exception {
         return kvRefreshDisk.refreshKeys(keys);
     }
 }

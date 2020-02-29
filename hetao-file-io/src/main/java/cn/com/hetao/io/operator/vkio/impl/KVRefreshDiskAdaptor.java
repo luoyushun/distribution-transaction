@@ -1,6 +1,7 @@
 package cn.com.hetao.io.operator.vkio.impl;
 
 import cn.com.hetao.io.config.FileOperatorConfig;
+import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.io.operator.vkio.KVRefreshDiskFactory;
 import cn.com.hetao.io.operator.vkio.KeyFactory;
 
@@ -21,7 +22,7 @@ public class KVRefreshDiskAdaptor implements KVRefreshDiskFactory {
     protected String defaultData = "default_k_v_datas";
 
     @Override
-    public List<Map<String, Object>> refreshValue(List<Map<String, Object>> keys) throws Exception {
+    public List<KeyObjectDefination> refreshValue(List<KeyObjectDefination> keys) throws Exception {
         String datasPath = FileOperatorConfig.dataPath + File.separator + defaultData + File.separator + defaultData + ".data";
         String dateTempPath = FileOperatorConfig.dataTempPath + File.separator + defaultData + File.separator + defaultData + ".temp";
         File file = new File(FileOperatorConfig.dataPath + File.separator + defaultData);
@@ -36,14 +37,14 @@ public class KVRefreshDiskAdaptor implements KVRefreshDiskFactory {
         file.createNewFile();
         RandomAccessFile randomFile = null;
         RandomAccessFile randomTempFile = null;
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<KeyObjectDefination> result = new ArrayList<>();
         try {
             randomFile = new RandomAccessFile(datasPath, "r");
             randomTempFile = new RandomAccessFile(dateTempPath, "rws");
             randomTempFile.seek(0);
-            for (Map<String, Object> data : keys) {
-                Long point = (Long) data.get(KeyFactory.point);
-                Long length = (Long) data.get(KeyFactory.length);
+            for (KeyObjectDefination data : keys) {
+                Long point = data.getPoint();
+                Long length = data.getLength();
                 byte[] bytes = new byte[Math.toIntExact(length)];
                 randomFile.seek(point);
                 int len = randomFile.read(bytes);
@@ -51,7 +52,7 @@ public class KVRefreshDiskAdaptor implements KVRefreshDiskFactory {
                 if (len != length) continue;
                 long pot = randomTempFile.getFilePointer();
                 randomTempFile.write(bytes);
-                data.put(KeyFactory.point, pot);
+                data.setPoint(pot);
                 result.add(data);
                 if (randomFile.getFilePointer() >= randomFile.length()) break;
             }
@@ -81,7 +82,7 @@ public class KVRefreshDiskAdaptor implements KVRefreshDiskFactory {
     }
 
     @Override
-    public boolean refreshKeys(List<Map<String, Object>> keys) throws Exception {
+    public boolean refreshKeys(List<KeyObjectDefination> keys) throws Exception {
         if (keys == null || keys.isEmpty()) return true;
         String dataPath = FileOperatorConfig.index + File.separator + defaultFileName;
         String dataTempPath = FileOperatorConfig.index + File.separator + defaultFileName + ".bak";
@@ -93,11 +94,11 @@ public class KVRefreshDiskAdaptor implements KVRefreshDiskFactory {
         RandomAccessFile accessFile = null;
         try {
             accessFile = new RandomAccessFile(dataPath, "rws");
-            for (Map<String, Object> keyInfo : keys) {
-                String str = (String) keyInfo.get(KeyFactory.name) + ":"
-                        + ((Long) keyInfo.get(KeyFactory.time)).longValue() + ":"
-                        + ((Long) keyInfo.get(KeyFactory.point)).longValue() + ":"
-                        + ((Long) keyInfo.get(KeyFactory.length)).longValue();
+            for (KeyObjectDefination keyInfo : keys) {
+                String str = keyInfo.getName() + ":"
+                        + keyInfo.getTimeout().longValue() + ":"
+                        + keyInfo.getPoint().longValue() + ":"
+                        + keyInfo.getLength().longValue();
                 str = str + "\n";
                 accessFile.write(str.getBytes());
             }

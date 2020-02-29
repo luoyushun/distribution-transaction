@@ -1,5 +1,7 @@
 package cn.com.hetao.io.operator.vkio;
 
+import cn.com.hetao.io.config.KeyObjectDefination;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +17,13 @@ public interface KVRefreshDiskFactory {
      * @param keys
      * @return
      */
-    public List<Map<String, Object>> refreshValue(List<Map<String, Object>> keys) throws Exception;
+    public List<KeyObjectDefination> refreshValue(List<KeyObjectDefination> keys) throws Exception;
 
     /**
      * 刷新保存数据
      * @param keys
      * @return
      */
-    public boolean refreshKeys(List<Map<String, Object>> keys) throws Exception;
+    public boolean refreshKeys(List<KeyObjectDefination> keys) throws Exception;
 
 }
