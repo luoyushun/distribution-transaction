@@ -1,11 +1,17 @@
 package cn.com.hetao.io.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/26 13:43
  *@desc 这个是文件操作的配置文件
  **/
-public class FileOperatorConfig {
+public class FileOperatorConfig implements Serializable {
 
     /**
      * 数据路径

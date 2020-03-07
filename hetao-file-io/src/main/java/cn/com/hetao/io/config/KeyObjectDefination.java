@@ -20,5 +20,7 @@ public class KeyObjectDefination implements Serializable {
     private Long point;
     private Long length;
     private Long timeout;
+    private boolean isDisk;
+    private boolean isDelete;
 
 }
