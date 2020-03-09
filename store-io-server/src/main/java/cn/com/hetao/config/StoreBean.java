@@ -10,6 +10,9 @@ import cn.com.hetao.io.operator.vkio.impl.KVRefreshDiskAdaptor;
 import cn.com.hetao.io.operator.vkio.impl.KeyAdaptor;
 import cn.com.hetao.io.operator.vkio.impl.ValueAdaptor;
 import cn.com.hetao.io.operator.vkio.impl.ValueKeyAdaptor;
+import cn.com.hetao.server.entity.NettyClientBean;
+import cn.com.hetao.server.entity.NoticeEntity;
+import cn.com.hetao.server.event.NoticeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +61,34 @@ public class StoreBean {
      */
     public static ValueFactory valueFactory = new ValueAdaptor();
 
+    /**
+     * 这个是缓存大小
+     */
     public static Long cacheSize = 600*1024*1024L;
 
+    /**
+     * 定时刷新磁盘的数据
+     */
     public static ScheduledThreadPoolExecutor reflushDisk = null;
+
+    /**
+     * 这个是保存已经取得连接服务的客户端
+     */
+    public static List<NettyClientBean> nettyClientBeans = new ArrayList<>();
+
+    /**
+     * 这个是保存没有取得连接的客户端的相关信息
+     */
+    public static List<String> lostNettyClient = new ArrayList<>();
+
+    /**
+     * 这个是保存通知的数据
+     */
+    public static ConcurrentMap<Long, List<NoticeEntity>> noticeStatus = new ConcurrentHashMap<>();
+
+    /**
+     * 这个是处理事件的数据
+     */
+    public static List<NoticeEvent> registerEvent = new ArrayList<>();
 
 }

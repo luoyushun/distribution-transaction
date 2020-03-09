@@ -37,7 +37,7 @@ public class StoreInitialConfig implements InitializingBean {
         initKey();
         StoreBean.reflushDisk = new ScheduledThreadPoolExecutor(20);
         initRefreshDisk();
-
+        whileTrue();
     }
 
     // 对配置文件进行配置
@@ -60,6 +60,7 @@ public class StoreInitialConfig implements InitializingBean {
         log.info("开始初始化key");
         try {
             List<KeyObjectDefination> keys = StoreBean.keyFactory.getKeysInfo();
+            if (keys == null) return;
             for (KeyObjectDefination defination: keys) {
                 defination.setDisk(true);
                 defination.setDelete(false);
@@ -71,14 +72,32 @@ public class StoreInitialConfig implements InitializingBean {
         log.info("初始化key结束");
     }
 
+    private void whileTrue() {
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    synchronized (StoreInitialConfig.this) {
+                        try {
+                            StoreInitialConfig.this.wait();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    initRefreshDisk();
+                }
+            }
+        })).start();
+    }
+
     /**
      * 这个是定时刷新磁盘
      */
     private void initRefreshDisk() {
-        log.info("开始初始化异步刷新磁盘");
         StoreBean.reflushDisk.schedule(new Runnable() {
             @Override
             public void run() {
+                log.debug("开始刷盘");
                 List<KeyObjectDefination> definations = new ArrayList<>();
                 synchronized (StoreBean.keyBeans) {
                     for (ConcurrentMap.Entry<String, KeyObjectDefination> entry : StoreBean.keyBeans.entrySet()) {
@@ -95,10 +114,12 @@ public class StoreInitialConfig implements InitializingBean {
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                log.debug("结束刷盘");
+                synchronized (StoreInitialConfig.this) {
+                    StoreInitialConfig.this.notify();
+                }
             }
         }, storeProperty.getFlushDisk(), TimeUnit.MILLISECONDS);
-        log.info("完成初始化异步刷新磁盘");
     }
 
 }

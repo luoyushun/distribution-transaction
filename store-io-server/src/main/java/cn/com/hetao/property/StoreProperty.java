@@ -25,5 +25,8 @@ public class StoreProperty implements Serializable {
     private String dataPath = "./data";
     private String indexPath = "./index";
     private Long maxFileSize = 1024*1024*1024L;
+    private String nettyServerAddr = "127.0.0.1:8809;127.0.0.1:8808";
+    private String serverIp = "127.0.0.1";
+    private Integer serverPort = 8809;
 
 }
