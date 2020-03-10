@@ -84,12 +84,12 @@ public class StoreMapperImpl implements StoreMapper {
     }
 
     @Override
-    public void setValue(String key, Object value, Long timeout) {
+    public boolean setValue(String key, Object value, Long timeout) {
         try {
             boolean c = StoreBean.valueKey.setValue(key, value, timeout);
             if (c) {
                 KeyObjectDefination defination = StoreBean.keyFactory.getKeyInfo(key);
-                if (defination == null) return;
+                if (defination == null) return false;
                 KeyObjectDefination keyDefination = StoreBean.keyBeans.get(key);
                 if (keyDefination == null) {
                     StoreBean.keyBeans.put(key, defination);
@@ -99,8 +99,52 @@ public class StoreMapperImpl implements StoreMapper {
                     keyDefination.setTimeout(timeout);
                 }
             }
+            return c;
         }catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
+    }
+
+    @Override
+    public boolean setNXValue(String key, Object value, Long timeout) {
+        KeyObjectDefination keyObjectDefination = StoreBean.keyBeans.get(key);
+        if (keyObjectDefination != null
+                && keyObjectDefination.getTimeout() > System.currentTimeMillis()
+                && keyObjectDefination.getTimeout() != 0
+                && !keyObjectDefination.isDelete()) {
+            return false;
+        }
+        return setValue(key, value, timeout);
+    }
+
+    @Override
+    public boolean setEXValue(String key, Object value, Long timeout) {
+        KeyObjectDefination keyObjectDefination = StoreBean.keyBeans.get(key);
+        if (keyObjectDefination == null
+                || (keyObjectDefination.getTimeout() <= System.currentTimeMillis()
+                && keyObjectDefination.getTimeout() != 0 )
+                || keyObjectDefination.isDelete()) {
+            return false;
+        }
+        return setValue(key, value, timeout);
+    }
+
+    @Override
+    public boolean deleteValue(String key) {
+        boolean c = StoreBean.keyFactory.deleteKeyInfo(key);
+        if (c) {
+            StoreBean.keyBeans.remove(key);
+            StoreBean.valueBeans.remove(key);
+            int size = StoreBean.valueBeanList.size();
+            for (int i = 0; i < size; i++) {
+                ValueObjectDefination defination = StoreBean.valueBeanList.get(i);
+                if (defination.getKey().equals(key)) {
+                    StoreBean.valueBeanList.remove(i);
+                    break;
+                }
+            }
+        }
+        return c;
     }
 }

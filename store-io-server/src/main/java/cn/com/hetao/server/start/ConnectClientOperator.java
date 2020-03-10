@@ -5,6 +5,7 @@ import cn.com.hetao.property.StoreProperty;
 import cn.com.hetao.server.NettyClient;
 import cn.com.hetao.server.entity.NettyClientBean;
 import cn.com.hetao.server.entity.NoticeEntity;
+import cn.com.hetao.server.enums.CommendsEnum;
 import cn.com.hetao.server.enums.NoticeStartEnum;
 import cn.com.hetao.server.enums.RequestStatusEnum;
 import cn.com.hetao.server.impl.NettyClinetSimple;
@@ -64,6 +65,7 @@ public class ConnectClientOperator {
             entity.setIsStart(NoticeStartEnum.SECOND);
             entity.setStatus(RequestStatusEnum.UNKNOWN);
             entity.setPriority(noticeEntity.getPriority());
+            entity.setCommend(CommendsEnum.NX_SAVE);
             noticeEntities.add(entity);
         }
         StoreBean.noticeStatus.put(noticeEntity.getId(), noticeEntities);

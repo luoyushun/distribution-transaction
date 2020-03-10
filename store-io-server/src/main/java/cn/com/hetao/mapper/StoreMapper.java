@@ -27,6 +27,31 @@ public interface StoreMapper {
      * @param value
      * @param timeout
      */
-    public void setValue(String key, Object value, Long timeout);
+    public boolean setValue(String key, Object value, Long timeout);
+
+    /**
+     * 这个是保存数据，如果对应的key值不存在
+     * @param key
+     * @param value
+     * @param timeout
+     * @return
+     */
+    public boolean setNXValue(String key, Object value, Long timeout);
+
+    /**
+     * 这个是保存数据，如果数据存在的话
+     * @param key
+     * @param value
+     * @param timeout
+     * @return
+     */
+    public boolean setEXValue(String key, Object value, Long timeout);
+
+    /**
+     * 这个是删除数据
+     * @param key
+     * @return
+     */
+    public boolean deleteValue(String key);
 
 }

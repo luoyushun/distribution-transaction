@@ -1,5 +1,6 @@
 package cn.com.hetao.server.entity;
 
+import cn.com.hetao.server.enums.CommendsEnum;
 import cn.com.hetao.server.enums.NoticeStartEnum;
 import cn.com.hetao.server.enums.RequestStatusEnum;
 import lombok.AllArgsConstructor;
@@ -43,5 +44,15 @@ public class NoticeEntity implements Serializable {
      * 这个是请求的状态
      */
     private NoticeStartEnum isStart;
+
+    /**
+     * 这个是命令集
+     */
+    private CommendsEnum commend;
+
+    /**
+     * 这个是时间
+     */
+    private Long timeout;
 
 }

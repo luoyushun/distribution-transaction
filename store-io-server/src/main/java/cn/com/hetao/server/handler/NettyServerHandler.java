@@ -1,21 +1,23 @@
 package cn.com.hetao.server.handler;
 
+import cn.com.hetao.server.entity.NoticeEntity;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 /*
  *@username LUOYUSHUN
  *@datetime 2020/3/8 19:33
- *@desc
+ *@desc 这个是处理数据的
  **/
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // 第一个是处理数据保存的问题
-
-        // 第二个是处理数据保存和筛选的问题
-
+       // 这个是来处理数据的，处理数据的
+        if (msg instanceof NoticeEntity) {
+            NettyServerDataDeal dataDeal = new NettyServerDataDealSimple();
+            dataDeal.dataDeal(ctx, (NoticeEntity) msg);
+        }
     }
 
     @Override
