@@ -23,18 +23,22 @@ public class NoticeEntity implements Serializable {
      * 这个是数据键
      */
     private String key;
+
     /**
      * 这个是主键
      */
     private Long id;
+
     /**
      * 这个是地址
      */
     private String ip;
+
     /**
      * 这个是优先级
      */
     private Integer priority;
+
     /**
      * 这个是请求状态
      */
