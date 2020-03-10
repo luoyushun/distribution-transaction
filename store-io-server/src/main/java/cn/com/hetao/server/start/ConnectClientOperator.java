@@ -27,15 +27,20 @@ public class ConnectClientOperator {
     @Resource
     private StoreProperty storeProperty;
 
+    @Resource
+    private NettyClinetSimple nettyClient;
+
     /**
      * 这个是初始化数据
      */
     @PostConstruct
     public void init() {
-        NettyClient nettyClient = new NettyClinetSimple();
         String[] stores = storeProperty.getNettyServerAddr().split(";");
         List<NettyClientBean> beans = nettyClient.connectNettyClient(stores);
         StoreBean.nettyClientBeans = beans;
+        if (beans == null) {
+            StoreBean.nettyClientBeans = new ArrayList<>();
+        }
         for (String url : stores) {
             boolean c = true;
             for (NettyClientBean bean : beans) {

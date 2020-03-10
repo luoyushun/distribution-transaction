@@ -30,6 +30,9 @@ public class NettyServerSimple implements NettyServer {
     @Resource
     private StoreProperty storeProperty;
 
+    @Resource
+    private NettyClinetSimple nettyClient;
+
     @Override
     public void startServer(String bindUrl, Integer port) {
         if (storeProperty.isEnableServer()) {
@@ -43,7 +46,7 @@ public class NettyServerSimple implements NettyServer {
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new ObjectEncoder());
                     ch.pipeline().addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
-                    ch.pipeline().addLast(new NettyServerHandler(simple));
+                    ch.pipeline().addLast(new NettyServerHandler(simple, nettyClient));
                 }
             });
             bootstrap.option(ChannelOption.SO_BACKLOG, 2048);
