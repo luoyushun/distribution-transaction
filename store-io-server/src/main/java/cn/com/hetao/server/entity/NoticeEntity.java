@@ -55,4 +55,9 @@ public class NoticeEntity implements Serializable {
      */
     private Long timeout;
 
+    /**
+     * 这个是数据
+     */
+    private Object value;
+
 }
