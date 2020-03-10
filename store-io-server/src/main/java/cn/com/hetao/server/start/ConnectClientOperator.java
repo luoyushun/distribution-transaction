@@ -2,7 +2,6 @@ package cn.com.hetao.server.start;
 
 import cn.com.hetao.config.StoreBean;
 import cn.com.hetao.property.StoreProperty;
-import cn.com.hetao.server.NettyClient;
 import cn.com.hetao.server.entity.NettyClientBean;
 import cn.com.hetao.server.entity.NoticeEntity;
 import cn.com.hetao.server.enums.CommendsEnum;
@@ -43,7 +42,7 @@ public class ConnectClientOperator {
         }
         for (String url : stores) {
             boolean c = true;
-            for (NettyClientBean bean : beans) {
+            for (NettyClientBean bean : StoreBean.nettyClientBeans) {
                 if (url.equals(bean.getUrl())) {
                     c = false;
                     break;
