@@ -12,12 +12,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/29 16:01
- *@desc 这个是保存数据或者设置数据
+ *@desc 这个是保存数据或者设置数据,这不能提供本身直接使用
  **/
 @Component
 public class StoreMapperImpl implements StoreMapper {
@@ -107,23 +108,33 @@ public class StoreMapperImpl implements StoreMapper {
     }
 
     @Override
-    public boolean setNXValue(String key, Object value, Long timeout) {
+    public boolean setNXValue(String key, Object value, Long timeout, Comparator comparator) {
         KeyObjectDefination keyObjectDefination = StoreBean.keyBeans.get(key);
         if (keyObjectDefination != null
-                && keyObjectDefination.getTimeout() > System.currentTimeMillis()
+                && (keyObjectDefination.getTimeout() > System.currentTimeMillis()
                 && keyObjectDefination.getTimeout() != 0
+                || keyObjectDefination.getTimeout() == 0)
                 && !keyObjectDefination.isDelete()) {
-            return false;
+            // 这里要进行判断
+            ValueObjectDefination defination = StoreBean.valueBeans.get(key);
+            if (comparator.compare(value, defination.getValue()) > 0) {
+                // 这里进行删除数据
+                StoreBean.valueBeans.remove(key);
+                StoreBean.keyBeans.remove(key);
+            } else {
+                return false;
+            }
         }
         return setValue(key, value, timeout);
     }
 
     @Override
-    public boolean setEXValue(String key, Object value, Long timeout) {
+    public boolean setEXValue(String key, Object value, Long timeout, Comparator comparator) {
         KeyObjectDefination keyObjectDefination = StoreBean.keyBeans.get(key);
         if (keyObjectDefination == null
                 || (keyObjectDefination.getTimeout() <= System.currentTimeMillis()
                 && keyObjectDefination.getTimeout() != 0 )
+                || keyObjectDefination.getTimeout() == 0
                 || keyObjectDefination.isDelete()) {
             return false;
         }

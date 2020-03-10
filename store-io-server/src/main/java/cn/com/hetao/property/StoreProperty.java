@@ -28,5 +28,6 @@ public class StoreProperty implements Serializable {
     private String nettyServerAddr = "127.0.0.1:8809;127.0.0.1:8808";
     private String serverIp = "127.0.0.1";
     private Integer serverPort = 8809;
+    private boolean enableServer = false;
 
 }

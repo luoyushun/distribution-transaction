@@ -1,11 +1,14 @@
 package cn.com.hetao.server.handler;
 
+import cn.com.hetao.config.StoreBean;
+import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.mapper.StoreMapper;
 import cn.com.hetao.mapper.StoreMapperImpl;
 import cn.com.hetao.server.entity.NoticeEntity;
 import cn.com.hetao.server.enums.CommendsEnum;
 import cn.com.hetao.server.enums.NoticeStartEnum;
 import cn.com.hetao.server.enums.RequestStatusEnum;
+import cn.com.hetao.server.event.NoticeEventResponse;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +23,12 @@ public class NettyServerDataDealSimple implements NettyServerDataDeal {
     Log log = LogFactory.getLog(NettyServerDataDealSimple.class);
     private StoreMapper storeMapper = new StoreMapperImpl();
 
+    private DealNewDataHandlerSimple simple;
+
+    public NettyServerDataDealSimple(DealNewDataHandlerSimple simple) {
+        this.simple = simple;
+    }
+
     @Override
     public void dataDeal(ChannelHandlerContext chc, NoticeEntity entity) {
         boolean c = false;
@@ -31,10 +40,16 @@ public class NettyServerDataDealSimple implements NettyServerDataDeal {
             c = storeMapper.deleteValue(entity.getKey());
         } else if (CommendsEnum.NX_SAVE == entity.getCommend()) {
             // 这里处理如果不存在就保存的业务
-            c = storeMapper.setNXValue(entity.getKey(), entity, entity.getTimeout());
+            if (entity.getIsStart() == NoticeStartEnum.FIRST) {
+                if (simple != null) {
+                    simple.dealData(chc, entity);
+                }
+            } else {
+                c = storeMapper.setNXValue(entity.getKey(), entity, entity.getTimeout(), StoreBean.comparator);
+            }
         } else if (CommendsEnum.EX_SAVE == entity.getCommend()) {
             // 这里是处理如果数据存在就修改数据
-            c = storeMapper.setEXValue(entity.getKey(), entity, entity.getTimeout());
+            c = storeMapper.setEXValue(entity.getKey(), entity, entity.getTimeout(), StoreBean.comparator);
         } else if (CommendsEnum.FIND == entity.getCommend()) {
             // 这里处理查询数据的
             entity = (NoticeEntity) storeMapper.getValue(entity.getKey());

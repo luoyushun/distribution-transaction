@@ -11,11 +11,17 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  **/
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
+    private DealNewDataHandlerSimple simple;
+
+    public NettyServerHandler(DealNewDataHandlerSimple simple) {
+        this.simple = simple;
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
        // 这个是来处理数据的，处理数据的
         if (msg instanceof NoticeEntity) {
-            NettyServerDataDeal dataDeal = new NettyServerDataDealSimple();
+            NettyServerDataDeal dataDeal = new NettyServerDataDealSimple(simple);
             dataDeal.dataDeal(ctx, (NoticeEntity) msg);
         }
     }

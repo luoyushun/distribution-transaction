@@ -1,5 +1,6 @@
 package cn.com.hetao.server.impl;
 
+import cn.com.hetao.property.StoreProperty;
 import cn.com.hetao.server.NettyClient;
 import cn.com.hetao.server.entity.NettyClientBean;
 import cn.com.hetao.server.handler.NettyClientHandler;
@@ -13,7 +14,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +25,22 @@ import java.util.List;
  *@datetime 2020/3/8 19:30
  *@desc netty 客户端的实现
  **/
+@Component
 public class NettyClinetSimple implements NettyClient {
+
+    @Resource
+    private StoreProperty storeProperty;
 
     @Override
     public List<NettyClientBean> connectNettyClient(String[] urls) {
-        List<NettyClientBean> beans = new ArrayList<>();
-        for (String url : urls) {
-            NettyClientBean bean = connectNettyClientOne(url);
-            if (bean == null) continue;
-            beans.add(bean);
+        if (storeProperty.isEnableServer()) {
+            List<NettyClientBean> beans = new ArrayList<>();
+            for (String url : urls) {
+                NettyClientBean bean = connectNettyClientOne(url);
+                if (bean == null) continue;
+                beans.add(bean);
+            }
         }
-
         return null;
     }
 

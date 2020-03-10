@@ -1,5 +1,7 @@
 package cn.com.hetao.mapper;
 
+import java.util.Comparator;
+
 /*
  *@username LUOYUSHUN
  *@datetime 2020/2/29 15:58
@@ -36,7 +38,7 @@ public interface StoreMapper {
      * @param timeout
      * @return
      */
-    public boolean setNXValue(String key, Object value, Long timeout);
+    public boolean setNXValue(String key, Object value, Long timeout, Comparator comparator);
 
     /**
      * 这个是保存数据，如果数据存在的话
@@ -45,7 +47,7 @@ public interface StoreMapper {
      * @param timeout
      * @return
      */
-    public boolean setEXValue(String key, Object value, Long timeout);
+    public boolean setEXValue(String key, Object value, Long timeout, Comparator comparator);
 
     /**
      * 这个是删除数据

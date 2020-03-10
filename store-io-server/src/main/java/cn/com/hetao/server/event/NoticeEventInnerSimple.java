@@ -4,7 +4,6 @@ import cn.com.hetao.config.StoreBean;
 import cn.com.hetao.server.entity.NoticeEntity;
 import cn.com.hetao.server.enums.RequestStatusEnum;
 
-import java.io.Serializable;
 import java.util.List;
 
 /*
@@ -28,18 +27,20 @@ public class NoticeEventInnerSimple implements NoticeEventInner {
             } else if (entity.getStatus() == RequestStatusEnum.FAIL) {
                 StoreBean.noticeStatus.remove(noticeEntity.getId());
                 // 这里直接返回结果，不必在乎接下来的任何处理了。
-
+                c = c && false;
+                break;
             } else {
                 c = c && false;
                 // 这里是出现了不能处理的事务的处理信息
+                break;
             }
         }
-        if (!c) return;
         // 这里是处理通知事务的数据
         // 这里情况数据
         StoreBean.noticeStatus.remove(noticeEntity.getId());
+        RequestStatusEnum statusEnum = c?RequestStatusEnum.SUCCESS:RequestStatusEnum.FAIL;
         for (NoticeEvent event : StoreBean.registerEvent) {
-            event.noticeListen(noticeEntity.getKey(), noticeEntity.getId(), noticeEntity.getStatus());
+            event.noticeListen(noticeEntity.getKey(), noticeEntity.getId(), statusEnum);
         }
     }
 

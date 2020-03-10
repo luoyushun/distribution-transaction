@@ -13,8 +13,10 @@ import cn.com.hetao.io.operator.vkio.impl.ValueKeyAdaptor;
 import cn.com.hetao.server.entity.NettyClientBean;
 import cn.com.hetao.server.entity.NoticeEntity;
 import cn.com.hetao.server.event.NoticeEvent;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -90,5 +92,15 @@ public class StoreBean {
      * 这个是处理事件的数据
      */
     public static List<NoticeEvent> registerEvent = new ArrayList<>();
+
+    /**
+     * 这个是比较的类
+     */
+    public static Comparator comparator = null;
+
+    /**
+     * 这个是记录数据处理的数据
+     */
+    public static ConcurrentMap<Long, ChannelHandlerContext> responseBody = new ConcurrentHashMap<>();
 
 }
