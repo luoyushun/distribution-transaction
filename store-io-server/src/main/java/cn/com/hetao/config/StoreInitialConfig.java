@@ -3,9 +3,9 @@ package cn.com.hetao.config;
 import cn.com.common.hetao.entity.fileio.FileConfig;
 import cn.com.hetao.io.FileIoFactoryAdaptor;
 import cn.com.hetao.io.FileIoFactoryConfig;
-import cn.com.hetao.io.config.FileOperatorConfig;
 import cn.com.hetao.io.config.KeyObjectDefination;
 import cn.com.hetao.property.StoreProperty;
+import cn.com.hetao.server.event.NoticeEventResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +37,7 @@ public class StoreInitialConfig implements InitializingBean {
         StoreBean.reflushDisk = new ScheduledThreadPoolExecutor(20);
         initRefreshDisk();
         whileTrue();
+        StoreBean.registerEvent.add(new NoticeEventResponse());
     }
 
     // 对配置文件进行配置
